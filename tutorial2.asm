@@ -115,10 +115,13 @@ loop1:				;sets all colours to black, turns off sound, score 1 field at top.
 	lodi,r0 $00		;screen black
 	stra,r0 backgnd
 
-	lodi,r0	$03
+	lodi,r0	%00000011
 	stra,r0 colours12	; obj 1 white, 2 red
-	lodi,r0	$29
+	lodi,r0	%00101001
 	stra,r0 colours34	; obj 3 green, 4 yellow
+
+	lodi,r0	%11100100
+	stra,r0 objectsize
 
 	lodi,r3 $0E
 loopISe:			;load sprite shapes and coords
@@ -136,7 +139,7 @@ loopISe:			;load sprite shapes and coords
 
 	retc,un
 
-
+	
 one:			
 	db	$08
 	db	$18
@@ -148,9 +151,9 @@ one:
 	db	$08
 	db	$1c
 	db	$1c
-	db	40	;hc
-	db	40	;hcb
-	db	60	;vc
+	db	10	;hc
+	db	10	;hcb
+	db	20	;vc
 	db	20	;voff
 two:			
 	db	$1c
@@ -163,8 +166,8 @@ two:
 	db	$20
 	db	$3e
 	db	$3e
-	db	80	
-	db	90	 
+	db	40	
+	db	35	 
 	db	60	
 	db	10	
 three:		
@@ -178,9 +181,9 @@ three:
 	db	$04
 	db	$7c
 	db	$7c
-	db	110
-	db	120	
 	db	60
+	db	120	
+	db	90
 	db	250
 four:			
 	db	$40
@@ -193,9 +196,9 @@ four:
 	db	$08
 	db	$08
 	db	$08
-	db	140
-	db	140	
-	db	60
+	db	100
+	db	110	
+	db	0
 	db	255	;
 
 

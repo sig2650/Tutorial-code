@@ -1,4 +1,4 @@
-Assembled by WinArcadia 26.32 beta at 20:53:47 on 28/4/2021---------------
+Assembled by WinArcadia 26.32 beta at 18:54:15 on 7/5/2021----------------
 
               :; Tutorial 2,   PVI objects
               :;========================================================================================
@@ -117,88 +117,91 @@ Assembled by WinArcadia 26.32 beta at 20:53:47 on 28/4/2021---------------
 002A  0400    :	lodi,r0 $00		;screen black
 002C  CC1FC6  :	stra,r0 backgnd
 
-002F  0403    :	lodi,r0	$03
+002F  0403    :	lodi,r0	%00000011
 0031  CC1FC1  :	stra,r0 colours12	; obj 1 white, 2 red
-0034  0429    :	lodi,r0	$29
+0034  0429    :	lodi,r0	%00101001
 0036  CC1FC2  :	stra,r0 colours34	; obj 3 green, 4 yellow
 
-0039  070E    :	lodi,r3 $0E
+0039  04E4    :	lodi,r0	%11100100
+003B  CC1FC0  :	stra,r0 objectsize
+
+003E  070E    :	lodi,r3 $0E
               :loopISe:			;load sprite shapes and coords
-003B  0F4056  :	loda,r0 one,r3-
-003E  CF7F00  :	stra,r0 shape1,r3
-0041  0F6064  :	loda,r0 two,r3
-0044  CF7F10  :	stra,r0 shape2,r3
-0047  0F6072  :	loda,r0 three,r3
-004A  CF7F20  :	stra,r0 shape3,r3
-004D  0F6080  :	loda,r0 four,r3
-0050  CF7F40  :	stra,r0 shape4,r3
-0053  5B66    :	brnr,r3 loopISe	
+0040  0F405B  :	loda,r0 one,r3-
+0043  CF7F00  :	stra,r0 shape1,r3
+0046  0F6069  :	loda,r0 two,r3
+0049  CF7F10  :	stra,r0 shape2,r3
+004C  0F6077  :	loda,r0 three,r3
+004F  CF7F20  :	stra,r0 shape3,r3
+0052  0F6085  :	loda,r0 four,r3
+0055  CF7F40  :	stra,r0 shape4,r3
+0058  5B66    :	brnr,r3 loopISe	
               :		
 
 
-0055  17      :	retc,un
+005A  17      :	retc,un
 
-
+              :	
               :one:			
-0056  08      :	db	$08
-0057  18      :	db	$18
-0058  08      :	db	$08
-0059  08      :	db	$08
-005A  08      :	db	$08
 005B  08      :	db	$08
-005C  08      :	db	$08
+005C  18      :	db	$18
 005D  08      :	db	$08
-005E  1C      :	db	$1c
-005F  1C      :	db	$1c
-0060  28      :	db	40	;hc
-0061  28      :	db	40	;hcb
-0062  3C      :	db	60	;vc
-0063  14      :	db	20	;voff
-              :two:			
+005E  08      :	db	$08
+005F  08      :	db	$08
+0060  08      :	db	$08
+0061  08      :	db	$08
+0062  08      :	db	$08
+0063  1C      :	db	$1c
 0064  1C      :	db	$1c
-0065  3E      :	db	$3e
-0066  22      :	db	$22
-0067  02      :	db	$02
-0068  0E      :	db	$0e
-0069  18      :	db	$18
-006A  30      :	db	$30
-006B  20      :	db	$20
-006C  3E      :	db	$3e
-006D  3E      :	db	$3e
-006E  50      :	db	80	
-006F  5A      :	db	90	 
-0070  3C      :	db	60	
-0071  0A      :	db	10	
+0065  0A      :	db	10	;hc
+0066  0A      :	db	10	;hcb
+0067  14      :	db	20	;vc
+0068  14      :	db	20	;voff
+              :two:			
+0069  1C      :	db	$1c
+006A  3E      :	db	$3e
+006B  22      :	db	$22
+006C  02      :	db	$02
+006D  0E      :	db	$0e
+006E  18      :	db	$18
+006F  30      :	db	$30
+0070  20      :	db	$20
+0071  3E      :	db	$3e
+0072  3E      :	db	$3e
+0073  28      :	db	40	
+0074  23      :	db	35	 
+0075  3C      :	db	60	
+0076  0A      :	db	10	
               :three:		
-0072  7C      :	db	$7c
-0073  7C      :	db	$7c
-0074  04      :	db	$04
-0075  04      :	db	$04
-0076  1C      :	db	$1c
-0077  1C      :	db	$1c
-0078  04      :	db	$04
+0077  7C      :	db	$7c
+0078  7C      :	db	$7c
 0079  04      :	db	$04
-007A  7C      :	db	$7c
-007B  7C      :	db	$7c
-007C  6E      :	db	110
-007D  78      :	db	120	
-007E  3C      :	db	60
-007F  FA      :	db	250
+007A  04      :	db	$04
+007B  1C      :	db	$1c
+007C  1C      :	db	$1c
+007D  04      :	db	$04
+007E  04      :	db	$04
+007F  7C      :	db	$7c
+0080  7C      :	db	$7c
+0081  3C      :	db	60
+0082  78      :	db	120	
+0083  5A      :	db	90
+0084  FA      :	db	250
               :four:			
-0080  40      :	db	$40
-0081  40      :	db	$40
-0082  40      :	db	$40
-0083  40      :	db	$40
-0084  48      :	db	$48
-0085  7E      :	db	$7e
-0086  7E      :	db	$7e
-0087  08      :	db	$08
-0088  08      :	db	$08
-0089  08      :	db	$08
-008A  8C      :	db	140
-008B  8C      :	db	140	
-008C  3C      :	db	60
-008D  FF      :	db	255	;
+0085  40      :	db	$40
+0086  40      :	db	$40
+0087  40      :	db	$40
+0088  40      :	db	$40
+0089  48      :	db	$48
+008A  7E      :	db	$7e
+008B  7E      :	db	$7e
+008C  08      :	db	$08
+008D  08      :	db	$08
+008E  08      :	db	$08
+008F  64      :	db	100
+0090  6E      :	db	110	
+0091  00      :	db	0
+0092  FF      :	db	255	;
 
 
 
@@ -303,8 +306,8 @@ symbol          0x0004  RESET
 symbol          0x0011  ENDLESS
 symbol          0x0013  INITPVI
 symbol          0x0016  LOOP1
-symbol          0x003B  LOOPISE
-symbol          0x0056  ONE
-symbol          0x0064  TWO
-symbol          0x0072  THREE
-symbol          0x0080  FOUR
+symbol          0x0040  LOOPISE
+symbol          0x005B  ONE
+symbol          0x0069  TWO
+symbol          0x0077  THREE
+symbol          0x0085  FOUR
