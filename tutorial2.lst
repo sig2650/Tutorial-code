@@ -1,313 +1,198 @@
-Assembled by WinArcadia 26.32 beta at 18:54:15 on 7/5/2021----------------
-
-              :; Tutorial 2,   PVI objects
-              :;========================================================================================
-
-
-              :; CONSTANTS
-              :; ---------
-
-
-              :carrybit	equ	$01
-              :compare		equ	$02
-              :withcarry	equ	$08
-              :registerselect	equ	$10
-              :intinhibit	equ 	$20
-              :stackpointer	equ	$07
-
-              :obj1complete	equ	$08
-              :obj2complete	equ	$04
-              :obj3complete	equ	$02
-              :obj4complete	equ	$01
-
-              :noise		equ	$1e80
-
-              :player1keys147c	equ	$1e88	;player1 keypad, bits: 1,4,7,clear,x,x,x,x
-              :player1keys2580	equ	$1e89	;player1 keypad, bits: 2,5,8,0,x,x,x,x
-              :player1keys369e	equ	$1e8a	;player1 keypad, bits: 3,6,9,enter,x,x,x,x
-              :console		equ	$1E8B	;start and select buttons on console
-
-              :consolestart	equ	$40
-              :consoleselect	equ	$80
-
-              :keymask123	equ	$80	;top row of keys
-              :keymask456	equ	$40
-              :keymask789	equ	$20
-              :keymaskc0e	equ	$10	;bottom row of keys
-
-
-
-              :shape1		equ	$1f00
-              :hc1		equ	$1f0a
-              :hcd1		equ	$1f0b
-              :vc1		equ	$1f0c
-              :voff1		equ	$1f0d
-
-              :shape2		equ	$1f10
-              :hc2		equ	$1f1a
-              :hcd2		equ	$1f1b
-              :vc2		equ	$1f1c
-              :voff2		equ	$1f1d
-
-              :shape3		equ	$1f20
-              :hc3		equ	$1f2a
-              :hcd3		equ	$1f2b
-              :vc3		equ	$1f2c
-              :voff3		equ	$1f2d
-
-              :shape4		equ	$1f40
-              :hc4		equ	$1f4a
-              :hcd4		equ	$1f4b
-              :vc4		equ	$1f4c
-              :voff4		equ	$1f4d
-
-              :griddefinition	equ	$1F80
-
-              :objectsize	equ	$1fc0
-              :colours12	equ	$1fc1
-              :colours34	equ	$1fc2
-              :scoreformat	equ	$1fc3	
-              :backgnd		equ	$1fc6
-              :;pitch		equ	$1fc7
-              :score12		equ	$1fc8
-              :score34		equ	$1fc9
-              :ocomplete	equ	$1fca
-              :collision	equ	$1fcb
-
-              :;=============================================================================
-
-
-
-              :reset_vector:
-0000  1F0004  :	bcta,un	reset
-              :interrupt_vector:
-0003  17      :	retc,un
-              :reset:	
-              :				;initialise program status word, just to be sure!
-0004  7620    :	ppsu	intinhibit	;inhibit interrupts
-0006  7407    :	cpsu	stackpointer	;stack pointer=0
-0008  7510    :	cpsl	registerselect	;register bank 0
-000A  7508    : 	cpsl	withcarry 	;without carry
-000C  7502    :	cpsl	compare		;arithmetic compare
-
-000E  3F0013  :	bsta,un InitPVI		;initialise video chip
-
-              :endless:
-0011  1B7E    :	bctr,un endless
-
-
-
-
-              :;===================================================================
-              :; subroutine - initialise PVI
-              :InitPVI:
-0013  20      :	eorz	r0		;r0 = 0
-0014  07CA    :	lodi,r3	$CA		;set 1F00-1FC9 to 00 (most of PVI)
-              :loop1:				;sets all colours to black, turns off sound, score 1 field at top.
-0016  CF5F00  :	stra,r0	shape1,r3,-
-0019  5B7B    :	brnr,r3	loop1
-
-001B  0402    :	lodi,r0 $02
-001D  CC1FC3  :	stra,r0 scoreformat	
-0020  04AA    :	lodi,r0 $aa		;blank the score digits
-0022  CC1FC8  :	stra,r0 score12
-0025  04AA    :	lodi,r0 $aa
-0027  CC1FC9  :	stra,r0 score34
-
-002A  0400    :	lodi,r0 $00		;screen black
-002C  CC1FC6  :	stra,r0 backgnd
-
-002F  0403    :	lodi,r0	%00000011
-0031  CC1FC1  :	stra,r0 colours12	; obj 1 white, 2 red
-0034  0429    :	lodi,r0	%00101001
-0036  CC1FC2  :	stra,r0 colours34	; obj 3 green, 4 yellow
-
-0039  04E4    :	lodi,r0	%11100100
-003B  CC1FC0  :	stra,r0 objectsize
-
-003E  070E    :	lodi,r3 $0E
-              :loopISe:			;load sprite shapes and coords
-0040  0F405B  :	loda,r0 one,r3-
-0043  CF7F00  :	stra,r0 shape1,r3
-0046  0F6069  :	loda,r0 two,r3
-0049  CF7F10  :	stra,r0 shape2,r3
-004C  0F6077  :	loda,r0 three,r3
-004F  CF7F20  :	stra,r0 shape3,r3
-0052  0F6085  :	loda,r0 four,r3
-0055  CF7F40  :	stra,r0 shape4,r3
-0058  5B66    :	brnr,r3 loopISe	
-              :		
-
-
-005A  17      :	retc,un
-
-              :	
-              :one:			
-005B  08      :	db	$08
-005C  18      :	db	$18
-005D  08      :	db	$08
-005E  08      :	db	$08
-005F  08      :	db	$08
-0060  08      :	db	$08
-0061  08      :	db	$08
-0062  08      :	db	$08
-0063  1C      :	db	$1c
-0064  1C      :	db	$1c
-0065  0A      :	db	10	;hc
-0066  0A      :	db	10	;hcb
-0067  14      :	db	20	;vc
-0068  14      :	db	20	;voff
-              :two:			
-0069  1C      :	db	$1c
-006A  3E      :	db	$3e
-006B  22      :	db	$22
-006C  02      :	db	$02
-006D  0E      :	db	$0e
-006E  18      :	db	$18
-006F  30      :	db	$30
-0070  20      :	db	$20
-0071  3E      :	db	$3e
-0072  3E      :	db	$3e
-0073  28      :	db	40	
-0074  23      :	db	35	 
-0075  3C      :	db	60	
-0076  0A      :	db	10	
-              :three:		
-0077  7C      :	db	$7c
-0078  7C      :	db	$7c
-0079  04      :	db	$04
-007A  04      :	db	$04
-007B  1C      :	db	$1c
-007C  1C      :	db	$1c
-007D  04      :	db	$04
-007E  04      :	db	$04
-007F  7C      :	db	$7c
-0080  7C      :	db	$7c
-0081  3C      :	db	60
-0082  78      :	db	120	
-0083  5A      :	db	90
-0084  FA      :	db	250
-              :four:			
-0085  40      :	db	$40
-0086  40      :	db	$40
-0087  40      :	db	$40
-0088  40      :	db	$40
-0089  48      :	db	$48
-008A  7E      :	db	$7e
-008B  7E      :	db	$7e
-008C  08      :	db	$08
-008D  08      :	db	$08
-008E  08      :	db	$08
-008F  64      :	db	100
-0090  6E      :	db	110	
-0091  00      :	db	0
-0092  FF      :	db	255	;
-
-
-
-
-Symbol Table--------------------------------------------------------------
-
-;Guest-specific:
-byte            0x1E8B  CONSOLE
-byte            0x1E8E  P2RIGHTKEYS
-byte            0x1E8D  P2MIDDLEKEYS
-byte            0x1E8C  P2LEFTKEYS
-byte            0x1E8A  P1RIGHTKEYS
-byte            0x1E89  P1MIDDLEKEYS
-byte            0x1E88  P1LEFTKEYS
-byte            0x1E80  NOISE
-code            0x1FCC  P1PADDLE
-code            0x1FCD  P2PADDLE
-code            0x1FCB  SPRITECOLLIDE
-code            0x1FCA  BGCOLLIDE
-code            0x1FC1  SPR01COLOURS
-code            0x1FC2  SPR23COLOURS
-code            0x1FC6  BGCOLOUR
-code            0x1FC7  PITCH
-code            0x1F4A  SPRITE3AX
-code            0x1F4C  SPRITE3AY
-code            0x1F2A  SPRITE2AX
-code            0x1F2C  SPRITE2AY
-code            0x1F1A  SPRITE1AX
-code            0x1F1C  SPRITE1AY
-code            0x1F0A  SPRITE0AX
-code            0x1F0C  SPRITE0AY
-code            0x1F4B  SPRITE3BX
-code            0x1F4D  SPRITE3BY
-code            0x1F2B  SPRITE2BX
-code            0x1F2D  SPRITE2BY
-code            0x1F1B  SPRITE1BX
-code            0x1F1D  SPRITE1BY
-code            0x1F0B  SPRITE0BX
-code            0x1F0D  SPRITE0BY
-code            0x1FC3  SCORECTRL
-code            0x1FC8  SCORELT
-code            0x1FC9  SCORERT
-code            0x1FA8  HORIZ1
-code            0x1FA9  HORIZ2
-code            0x1FAA  HORIZ3
-code            0x1FAB  HORIZ4
-code            0x1FAC  HORIZ5
-code            0x1FC0  SIZES
-;User-defined:
-symbol          0x0001  CARRYBIT
-symbol          0x0002  COMPARE
-symbol          0x0008  WITHCARRY
-symbol          0x0010  REGISTERSELECT
-symbol          0x0020  INTINHIBIT
-symbol          0x0007  STACKPOINTER
-symbol          0x0008  OBJ1COMPLETE
-symbol          0x0004  OBJ2COMPLETE
-symbol          0x0002  OBJ3COMPLETE
-symbol          0x0001  OBJ4COMPLETE
-symbol          0x1E88  PLAYER1KEYS147C
-symbol          0x1E89  PLAYER1KEYS2580
-symbol          0x1E8A  PLAYER1KEYS369E
-symbol          0x0040  CONSOLESTART
-symbol          0x0080  CONSOLESELECT
-symbol          0x0080  KEYMASK123
-symbol          0x0040  KEYMASK456
-symbol          0x0020  KEYMASK789
-symbol          0x0010  KEYMASKC0E
-symbol          0x1F00  SHAPE1
-symbol          0x1F0A  HC1
-symbol          0x1F0B  HCD1
-symbol          0x1F0C  VC1
-symbol          0x1F0D  VOFF1
-symbol          0x1F10  SHAPE2
-symbol          0x1F1A  HC2
-symbol          0x1F1B  HCD2
-symbol          0x1F1C  VC2
-symbol          0x1F1D  VOFF2
-symbol          0x1F20  SHAPE3
-symbol          0x1F2A  HC3
-symbol          0x1F2B  HCD3
-symbol          0x1F2C  VC3
-symbol          0x1F2D  VOFF3
-symbol          0x1F40  SHAPE4
-symbol          0x1F4A  HC4
-symbol          0x1F4B  HCD4
-symbol          0x1F4C  VC4
-symbol          0x1F4D  VOFF4
-symbol          0x1F80  GRIDDEFINITION
-symbol          0x1FC0  OBJECTSIZE
-symbol          0x1FC1  COLOURS12
-symbol          0x1FC2  COLOURS34
-symbol          0x1FC3  SCOREFORMAT
-symbol          0x1FC6  BACKGND
-symbol          0x1FC8  SCORE12
-symbol          0x1FC9  SCORE34
-symbol          0x1FCA  OCOMPLETE
-symbol          0x1FCB  COLLISION
-symbol          0x0000  RESET_VECTOR
-symbol          0x0003  INTERRUPT_VECTOR
-symbol          0x0004  RESET
-symbol          0x0011  ENDLESS
-symbol          0x0013  INITPVI
-symbol          0x0016  LOOP1
-symbol          0x0040  LOOPISE
-symbol          0x005B  ONE
-symbol          0x0069  TWO
-symbol          0x0077  THREE
-symbol          0x0085  FOUR
+0000          ; Tutorial 2,   PVI objects
+0000          ;========================================================================================
+0000          
+0000          
+0000          ; CONSTANTS
+0000          ; ---------
+0000          
+0000          carrybit	equ	$01
+0000          compare		equ	$02
+0000          withcarry	equ	$08
+0000          registerselect	equ	$10
+0000          intinhibit	equ 	$20
+0000          stackpointer	equ	$07
+0000          
+0000          obj1complete	equ	$08
+0000          obj2complete	equ	$04
+0000          obj3complete	equ	$02
+0000          obj4complete	equ	$01
+0000          
+0000          effects		equ	$1e80
+0000          
+0000          player1keys147c	equ	$1e88	;player1 keypad, bits: 1,4,7,clear,x,x,x,x
+0000          player1keys2580	equ	$1e89	;player1 keypad, bits: 2,5,8,0,x,x,x,x
+0000          player1keys369e	equ	$1e8a	;player1 keypad, bits: 3,6,9,enter,x,x,x,x
+0000          console		equ	$1E8B	;start and select buttons on console
+0000          
+0000          consolestart	equ	$40
+0000          consoleselect	equ	$80
+0000          
+0000          keymask123	equ	$80	;top row of keys
+0000          keymask456	equ	$40
+0000          keymask789	equ	$20
+0000          keymaskc0e	equ	$10	;bottom row of keys
+0000          
+0000          
+0000          
+0000          shape1		equ	$1f00
+0000          hc1		equ	$1f0a
+0000          hcd1		equ	$1f0b
+0000          vc1		equ	$1f0c
+0000          voff1		equ	$1f0d
+0000          
+0000          shape2		equ	$1f10
+0000          hc2		equ	$1f1a
+0000          hcd2		equ	$1f1b
+0000          vc2		equ	$1f1c
+0000          voff2		equ	$1f1d
+0000          
+0000          shape3		equ	$1f20
+0000          hc3		equ	$1f2a
+0000          hcd3		equ	$1f2b
+0000          vc3		equ	$1f2c
+0000          voff3		equ	$1f2d
+0000          
+0000          shape4		equ	$1f40
+0000          hc4		equ	$1f4a
+0000          hcd4		equ	$1f4b
+0000          vc4		equ	$1f4c
+0000          voff4		equ	$1f4d
+0000          
+0000          griddefinition	equ	$1F80
+0000          
+0000          objectsize	equ	$1fc0
+0000          colours12	equ	$1fc1
+0000          colours34	equ	$1fc2
+0000          scoreformat	equ	$1fc3
+0000          backgnd		equ	$1fc6
+0000          ;pitch		equ	$1fc7
+0000          score12		equ	$1fc8
+0000          score34		equ	$1fc9
+0000          ocomplete	equ	$1fca
+0000          collision	equ	$1fcb
+0000          
+0000          ;=============================================================================
+0000          
+0000          
+0000          
+0000          reset_vector:
+0000 1F 00 04 	bcta,un	reset
+0003          interrupt_vector:
+0003 17       	retc,un
+0004          reset:	
+0004          				;initialise program status word, just to be sure!
+0004 76 20    	ppsu	intinhibit	;inhibit interrupts
+0006 74 07    	cpsu	stackpointer	;stack pointer=0
+0008 75 10    	cpsl	registerselect	;register bank 0
+000A 75 08     	cpsl	withcarry 	;without carry
+000C 75 02    	cpsl	compare		;arithmetic compare
+000E          
+000E 20       	eorz	r0
+000F CC 1E 80 	stra,r0	effects		;initialise the 74LS378
+0012          	
+0012 3F 00 17 	bsta,un InitPVI		;initialise video chip
+0015          
+0015          endless:
+0015 1B 7E    	bctr,un endless
+0017          
+0017          ;===================================================================
+0017          ; subroutine - initialise PVI
+0017          InitPVI:
+0017 20       	eorz	r0		;r0 = 0
+0018 07 CA    	lodi,r3	$CA		;set 1F00-1FC9 to 00 (most of PVI)
+001A          loop1:				;sets all colours to black, turns off sound, score 1 field at top.
+001A CF 5F 00 	stra,r0	shape1,r3-
+001D 5B 7B    	brnr,r3	loop1
+001F          
+001F 04 02    	lodi,r0 $02
+0021 CC 1F C3 	stra,r0 scoreformat	
+0024 04 AA    	lodi,r0 $aa		;blank the score digits
+0026 CC 1F C8 	stra,r0 score12
+0029 04 AA    	lodi,r0 $aa
+002B CC 1F C9 	stra,r0 score34
+002E          
+002E 04 78    	lodi,r0 $78		;screen black
+0030 CC 1F C6 	stra,r0 backgnd
+0033          
+0033 04 03    	lodi,r0	%00000011
+0035 CC 1F C1 	stra,r0 colours12	; obj 1 white, 2 red
+0038 04 29    	lodi,r0	%00101001
+003A CC 1F C2 	stra,r0 colours34	; obj 3 green, 4 yellow
+003D          
+003D 04 E4    	lodi,r0	%11100100
+003F CC 1F C0 	stra,r0 objectsize
+0042          
+0042 07 0E    	lodi,r3 $0E
+0044          loopISe:			;load sprite shapes and coords
+0044 0F 40 5F 	loda,r0 one,r3-
+0047 CF 7F 00 	stra,r0 shape1,r3
+004A 0F 60 6D 	loda,r0 two,r3
+004D CF 7F 10 	stra,r0 shape2,r3
+0050 0F 60 7B 	loda,r0 three,r3
+0053 CF 7F 20 	stra,r0 shape3,r3
+0056 0F 60 89 	loda,r0 four,r3
+0059 CF 7F 40 	stra,r0 shape4,r3
+005C 5B 66    	brnr,r3 loopISe	
+005E 17       	retc,un
+005F          
+005F          	
+005F          one:			
+005F 08       	db	$08
+0060 18       	db	$18
+0061 08       	db	$08
+0062 08       	db	$08
+0063 08       	db	$08
+0064 08       	db	$08
+0065 08       	db	$08
+0066 08       	db	$08
+0067 1C       	db	$1c
+0068 1C       	db	$1c
+0069 0A       	db	10	;hc
+006A 0A       	db	10	;hcb
+006B 14       	db	20	;vc
+006C 14       	db	20	;voff
+006D          two:			
+006D 1C       	db	$1c
+006E 3E       	db	$3e
+006F 22       	db	$22
+0070 02       	db	$02
+0071 0E       	db	$0e
+0072 18       	db	$18
+0073 30       	db	$30
+0074 20       	db	$20
+0075 3E       	db	$3e
+0076 3E       	db	$3e
+0077 28       	db	40	
+0078 23       	db	35	 
+0079 3C       	db	60	
+007A 0A       	db	10	
+007B          three:		
+007B 7C       	db	$7c
+007C 7C       	db	$7c
+007D 04       	db	$04
+007E 04       	db	$04
+007F 1C       	db	$1c
+0080 1C       	db	$1c
+0081 04       	db	$04
+0082 04       	db	$04
+0083 7C       	db	$7c
+0084 7C       	db	$7c
+0085 3C       	db	60
+0086 78       	db	120	
+0087 5A       	db	90
+0088 FA       	db	250
+0089          four:			
+0089 40       	db	$40
+008A 40       	db	$40
+008B 40       	db	$40
+008C 40       	db	$40
+008D 48       	db	$48
+008E 7E       	db	$7e
+008F 7E       	db	$7e
+0090 08       	db	$08
+0091 08       	db	$08
+0092 08       	db	$08
+0093 64       	db	100
+0094 6E       	db	110	
+0095 00       	db	0
+0096 FF       	db	255	;

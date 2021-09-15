@@ -5,7 +5,6 @@
 ; CONSTANTS
 ; ---------
 
-
 carrybit	equ	$01
 compare		equ	$02
 withcarry	equ	$08
@@ -18,7 +17,7 @@ obj2complete	equ	$04
 obj3complete	equ	$02
 obj4complete	equ	$01
 
-noise		equ	$1e80
+effects		equ	$1e80
 
 player1keys147c	equ	$1e88	;player1 keypad, bits: 1,4,7,clear,x,x,x,x
 player1keys2580	equ	$1e89	;player1 keypad, bits: 2,5,8,0,x,x,x,x
@@ -64,7 +63,7 @@ griddefinition	equ	$1F80
 objectsize	equ	$1fc0
 colours12	equ	$1fc1
 colours34	equ	$1fc2
-scoreformat	equ	$1fc3	
+scoreformat	equ	$1fc3
 backgnd		equ	$1fc6
 ;pitch		equ	$1fc7
 score12		equ	$1fc8
@@ -88,13 +87,13 @@ reset:
  	cpsl	withcarry 	;without carry
 	cpsl	compare		;arithmetic compare
 
+	eorz	r0
+	stra,r0	effects		;initialise the 74LS378
+	
 	bsta,un InitPVI		;initialise video chip
 
 endless:
 	bctr,un endless
-
-
-
 
 ;===================================================================
 ; subroutine - initialise PVI
@@ -102,7 +101,7 @@ InitPVI:
 	eorz	r0		;r0 = 0
 	lodi,r3	$CA		;set 1F00-1FC9 to 00 (most of PVI)
 loop1:				;sets all colours to black, turns off sound, score 1 field at top.
-	stra,r0	shape1,r3,-
+	stra,r0	shape1,r3-
 	brnr,r3	loop1
 
 	lodi,r0 $02
@@ -112,7 +111,7 @@ loop1:				;sets all colours to black, turns off sound, score 1 field at top.
 	lodi,r0 $aa
 	stra,r0 score34
 
-	lodi,r0 $00		;screen black
+	lodi,r0 $78		;screen black
 	stra,r0 backgnd
 
 	lodi,r0	%00000011
@@ -134,9 +133,6 @@ loopISe:			;load sprite shapes and coords
 	loda,r0 four,r3
 	stra,r0 shape4,r3
 	brnr,r3 loopISe	
-		
-
-
 	retc,un
 
 	
@@ -200,6 +196,3 @@ four:
 	db	110	
 	db	0
 	db	255	;
-
-
-
